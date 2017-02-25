@@ -1,0 +1,95 @@
+buildscript {
+    ext.kotlin_version = '1.0.6'
+
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'com.jfrog.bintray' version '1.7.2'
+    id 'net.researchgate.release' version '2.4.1'
+    id 'maven'
+}
+apply plugin: 'kotlin'
+
+group 'net.dinomite.fcm-client'
+version project.version
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile "org.apache.httpcomponents:httpclient:$httpClientVersion"
+
+    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+
+    testCompile "junit:junit:$junitVersion"
+    testCompile "com.github.tomakehurst:wiremock:$wireMockVersion"
+    testCompile "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    testCompile "org.slf4j:slf4j-simple:$slf4jVersion"
+}
+
+task sourceJar(type: Jar, dependsOn: classes) {
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    from javadoc.destinationDir
+}
+
+publishing {
+    publications {
+        bintray(MavenPublication) {
+            from components.java
+            groupId project.group
+            artifactId project.name
+            version project.version
+
+            artifact sourceJar {
+                classifier 'sources'
+            }
+
+            artifact javadocJar {
+                classifier 'javadoc'
+            }
+        }
+    }
+}
+
+release {
+    tagTemplate = 'v$version'
+    afterReleaseBuild.dependsOn bintrayUpload
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['bintray']
+
+    pkg {
+        repo = 'maven'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/dinomite/fcm-client'
+        name = 'net.dinomite.fcm-client'
+
+        version {
+            name = project.version
+            released = new Date()
+            vcsTag = 'v' + project.version
+        }
+    }
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+}
