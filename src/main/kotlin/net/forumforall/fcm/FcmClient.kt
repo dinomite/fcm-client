@@ -1,5 +1,6 @@
 package net.forumforall.fcm
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectReader
 import com.fasterxml.jackson.databind.ObjectWriter
 import org.apache.commons.codec.Charsets
@@ -11,22 +12,25 @@ import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.message.BasicHeader
 import org.apache.http.util.EntityUtils
+import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 import java.util.function.Supplier
-import kotlin.reflect.jvm.internal.impl.javax.inject.Inject
 
 interface FcmClient {
     fun sendNotification(notification: FcmNotification): CompletableFuture<FcmResponse>
 }
 
-class FcmClientImpl
-@Inject
-constructor(val httpClient: CloseableHttpClient, val fcmUrl: URI, val fcmKey: String,
-            val objectWriter: ObjectWriter, objectReader: ObjectReader,
-            val executorService: ExecutorService? = null) : FcmClient {
-    val responseReader: ObjectReader = objectReader.forType(FcmResponse::class.java)
+/**
+ *
+ */
+class FcmClientImpl(val httpClient: CloseableHttpClient, val fcmUrl: URI, fcmKey: String,
+            objectMapper: ObjectMapper, val executorService: ExecutorService? = null) : FcmClient {
+    private val logger = LoggerFactory.getLogger(this.javaClass.name)
+
+    val responseReader: ObjectReader = objectMapper.readerFor(FcmResponse::class.java)
+    val objectWriter: ObjectWriter = objectMapper.writer()
     val contentType: ContentType = ContentType.APPLICATION_JSON.withCharset(Charsets.UTF_8)
     val authHeader: Header = BasicHeader(HttpHeaders.AUTHORIZATION, "key=$fcmKey")
 
@@ -45,9 +49,8 @@ constructor(val httpClient: CloseableHttpClient, val fcmUrl: URI, val fcmKey: St
 
         httpClient.execute(post).use { response ->
             val code = response.statusLine.statusCode
-            if (code != 200) {
-                throw FcmException("HTTP response from FCM: " + code)
-            }
+            if (code == 401) throw FcmException("Authentication Error")
+            if (code != 200) throw FcmException("Unhappy HTTP response from FCM: " + code)
 
             val entity = response.entity ?: throw FcmException("Empty entity from FCM")
             val entityString = EntityUtils.toString(entity, Charsets.UTF_8) ?: throw FcmException("Unable to decode response")
