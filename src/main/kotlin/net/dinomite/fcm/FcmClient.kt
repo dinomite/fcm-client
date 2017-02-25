@@ -1,4 +1,4 @@
-package net.forumforall.fcm
+package net.dinomite.fcm
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectReader
@@ -26,12 +26,12 @@ interface FcmClient {
  *
  */
 class FcmClientImpl(val httpClient: CloseableHttpClient, val fcmUrl: URI, fcmKey: String,
-            objectMapper: ObjectMapper, val executorService: ExecutorService? = null) : FcmClient {
+                    objectMapper: ObjectMapper, val executorService: ExecutorService? = null) : FcmClient {
     private val logger = LoggerFactory.getLogger(this.javaClass.name)
 
     val responseReader: ObjectReader = objectMapper.readerFor(FcmResponse::class.java)
     val objectWriter: ObjectWriter = objectMapper.writer()
-    val contentType: ContentType = ContentType.APPLICATION_JSON.withCharset(Charsets.UTF_8)
+    val contentType: ContentType = ContentType.APPLICATION_JSON.withCharset(org.apache.commons.codec.Charsets.UTF_8)
     val authHeader: Header = BasicHeader(HttpHeaders.AUTHORIZATION, "key=$fcmKey")
 
     override fun sendNotification(notification: FcmNotification): CompletableFuture<FcmResponse> {
@@ -53,7 +53,7 @@ class FcmClientImpl(val httpClient: CloseableHttpClient, val fcmUrl: URI, fcmKey
             if (code != 200) throw FcmException("Unhappy HTTP response from FCM: " + code)
 
             val entity = response.entity ?: throw FcmException("Empty entity from FCM")
-            val entityString = EntityUtils.toString(entity, Charsets.UTF_8) ?: throw FcmException("Unable to decode response")
+            val entityString = EntityUtils.toString(entity, org.apache.commons.codec.Charsets.UTF_8) ?: throw FcmException("Unable to decode response")
 
             return responseReader.readValue(entityString)
         }

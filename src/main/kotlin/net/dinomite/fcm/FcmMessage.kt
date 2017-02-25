@@ -1,4 +1,4 @@
-package net.forumforall.fcm
+package net.dinomite.fcm
 
 data class FcmNotification(val to: String,
                            val registrationIds: List<String>? = null,

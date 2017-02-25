@@ -1,4 +1,4 @@
-package net.forumforall.fcm
+package net.dinomite.fcm
 
 import com.fasterxml.jackson.annotation.JsonCreator
 

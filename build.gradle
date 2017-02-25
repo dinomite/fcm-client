@@ -19,7 +19,7 @@ plugins {
 }
 apply plugin: 'kotlin'
 
-group 'net.dinomite.fcm-client'
+group 'net.dinomite.fcm'
 version project.version
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -82,7 +82,7 @@ bintray {
         repo = 'maven'
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/dinomite/fcm-client'
-        name = 'net.dinomite.fcm-client'
+        name = 'net.dinomite.fcm.fcm-client'
 
         version {
             name = project.version

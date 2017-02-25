@@ -1,3 +1,3 @@
-package net.forumforall.fcm
+package net.dinomite.fcm
 
 class FcmException(message: String) : Throwable(message)

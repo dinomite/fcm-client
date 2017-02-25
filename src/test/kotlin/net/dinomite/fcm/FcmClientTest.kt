@@ -1,4 +1,4 @@
-package net.forumforall.fcm
+package net.dinomite.fcm
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.matching.UrlPattern
+import net.dinomite.fcm.*
 import org.apache.http.HttpHeaders
 import org.apache.http.impl.client.HttpClients
 import org.junit.Assert.assertEquals
