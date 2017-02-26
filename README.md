@@ -72,12 +72,56 @@ future.whenComplete { fcmResponse, throwable ->
 
 Handling responses to multicast messages is left as an exercise for the reader.
 
-# Usage (in Java, but you should really start using Kotlin)
+# Usage (in Java)
+
+The above examples are written in Kotlin; below is equivalent code in Java to make it easier
+to understand for those who don't know the newer (and better, Kotlin).
+You'll note the lack of [builders](https://en.wikipedia.org/wiki/Builder_pattern) for the complex
+FCM data holding objects.  Kotlin has named arguments, which means you don't need to write builders
+and that object construction is less verbose.  Unfortunately, this means that when using those
+objects in Java you have to supply all fields, even optional ones.  The best fix is to start using
+Kotlin, which is incredibly easy to add to any Java project and will make your life better.
 
 ```java
-FcmClient fcmClient = new FcmClientImpl(new URI("https://fcm.googleapis.com/fcm/send"),
+FcmClient fcmClient = new FcmClientImpl(
+        new URI("https://fcm.googleapis.com/fcm/send"),
         "your-fcm-server-key",
         HttpClients.createDefault(),
         new ObjectMapper(),
         null);
+
+String token = "device-token";
+Notification notification = new Notification("title", null, null, null, null, null, null, null, null, null, null);
+FcmMessage message = new FcmMessage(token, null, null, null, null, null, null, null, notification, null);
+CompletableFuture<FcmResponse> future = fcmClient.sendNotification(message);
+
+future.whenComplete((fcmResponse, throwable) -> {
+    if (throwable != null) {
+        logger.warn("Error sending to FCM", throwable);
+    } else if (fcmResponse.getFailure() == 1) {
+        logger.warn("Notification rejected by FCM: $fcmResponse");
+
+        List<Result> results = fcmResponse.getResults();
+        for (Result result : results) {
+            if (result.getError() == Error.NOT_REGISTERED) {
+                logger.info(Error.NOT_REGISTERED + " for token <" + token +
+                        "> (registrationId " + result.getRegistrationId() + ")");
+                // Delete token from your DB
+            } else if (result.getError() != null) {
+                logger.warn("Error from FCM for registrationId " + result.getRegistrationId() + ": " + result.getError());
+            }
+        }
+    } else {
+        if (fcmResponse.getSuccess() == 1) {
+            logger.info("Push notification accepted by FCM");
+        }
+
+        if (fcmResponse.getCanonicalIds() == 1) {
+            String newToken = fcmResponse.getResults().get(1).getRegistrationId();
+            if (newToken != null) {
+                // Update the token in your DB
+            }
+        }
+    }
+});
 ```
