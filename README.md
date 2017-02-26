@@ -26,32 +26,50 @@ sending notifications.  If none is provided, the `ForkJoinPool` is used.
 Sending messages:
 
 ```kotlin
-val notification = FcmNotification(to = "device-token",
-                                   notification = Notification(title = "title"))
+val message = FcmNotification(to = "device-token", message = Notification(title = "title"))
 
 val future = fcmClient.sendNotification(fcmNotification)
 ```
 
 `sendNotification()` gives you a [`CompletableFuture`](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html).
-If FCM rejects a message with 
+The future will complete exceptionally if FCM responds with an authentication or HTTP error,
+or if `FcmClient` was unable to read & parse the response.
+
+If the message was submitted successfully, the response from FCM contains a number of things
+mentioned in the documentation, but the important parts as I understand it are removing tokens
+from your database that FCM has said are not registered (that is, the user unregistered their
+device) and updating tokens that FCM says have changed.
+
+For handling the response from sending to a single device, I use this handler:
 
 ```kotlin
 future.whenComplete { fcmResponse, throwable ->
     if (throwable != null) {
         logger.warn("Error sending to FCM", throwable)
-    } else if (fcmResponse.success == 1) {
-        logger.info("Push notification accepted by FCM")
-    } else {
+    } else if (fcmResponse.failure == 1) {
         logger.warn("Notification rejected by FCM: $fcmResponse")
 
         fcmResponse.results.forEach {
-            if (it.error == NOT_REGISTERED) {
-                logger.info("$NOT_REGISTERED for token $token (registrationId ${it.registrationId})")
-                tokenDao.deleteToken(token)
+            if (it.error == Error.NOT_REGISTERED) {
+                logger.info("${Error.NOT_REGISTERED} for token <${token}> (registrationId ${it.registrationId})")
+                // Delete token from your DB
             } else if (it.error != null) {
                 logger.warn("Error from FCM for registrationId ${it.registrationId}: ${it.error}")
+            }
+        }
+    } else {
+        if (fcmResponse.success == 1) {
+            logger.info("Push notification accepted by FCM")
+        }
+
+        if (fcmResponse.canonicalIds == 1) {
+            val newToken = fcmResponse.results.first().registrationId
+            if (newToken != null) {
+                // Update the token in your DB
             }
         }
     }
 }
 ```
+
+Handling responses to multicast messages is left as an exercise for the reader.

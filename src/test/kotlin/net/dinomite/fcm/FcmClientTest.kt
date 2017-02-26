@@ -36,7 +36,7 @@ class FcmClientTest {
 
     @Test
     fun sendNotification() {
-        val notification = FcmNotification(to = "device-token", notification = Notification(title = "title"))
+        val notification = FcmMessage(to = "device-token", notification = Notification(title = "title"))
         val expectedResponse = FcmResponse(7, 1, 0, 0, listOf())
 
         wireMockServer.stubFor(post(fcmUrlPathMatcher)
@@ -57,7 +57,7 @@ class FcmClientTest {
 
     @Test
     fun sendNotification_AuthenticationError() {
-        val notification = FcmNotification(to = "device-token", notification = Notification(title = "title"))
+        val notification = FcmMessage(to = "device-token", notification = Notification(title = "title"))
         val expectedResponse = FcmResponse(7, 1, 0, 0, listOf())
 
         wireMockServer.stubFor(post(fcmUrlPathMatcher)
@@ -84,7 +84,7 @@ class FcmClientTest {
 
     @Test
     fun sendNotification_InvalidRegistration() {
-        val notification = FcmNotification(to = "device-token", notification = Notification(title = "title"))
+        val notification = FcmMessage(to = "device-token", notification = Notification(title = "title"))
         val expectedResponse = FcmResponse(7, 1, 0, 0, listOf(Result("7", "device-token", Error.INVALID_REGISTRATION)))
 
         wireMockServer.stubFor(post(fcmUrlPathMatcher)
