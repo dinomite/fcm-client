@@ -31,7 +31,7 @@ class FcmClientTest {
         fcmUrl = URI("http://localhost:${wireMockServer.port()}/firebase")
         fcmUrlPathMatcher = urlEqualTo(fcmUrl.path)
 
-        fcmClient = FcmClientImpl(HttpClients.createDefault(), fcmUrl, fcmKey, objectMapper)
+        fcmClient = FcmClientImpl(fcmUrl, fcmKey, HttpClients.createDefault(), objectMapper)
     }
 
     @Test

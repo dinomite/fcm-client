@@ -9,15 +9,13 @@ Firebase doesn't provide a Java library for sending messages, and simply points 
 library is a simple implementation of that doc including objects to represent the messages you
 send to Firebase and the responses they give.
 
-# Usage
+# Usage (in [Kotlin](https://blog.plan99.net/why-kotlin-is-my-next-programming-language-c25c001e26e3#.bmukwp6az))
 
 First, construct an `FcmClient`:
 
 ```kotlin
-FcmClientImpl(HttpClients.createDefault(),
-              "https://fcm.googleapis.com/fcm/send",
-              "your-fcm-server-key",
-              ObjectMapper())
+FcmClientImpl(URI("https://fcm.googleapis.com/fcm/send"), "your-fcm-server-key",
+              HttpClients.createDefault(), ObjectMapper())
 ```
 
 There is an optional final parameter to the `FcmClientImpl`, an `ExecutorService` to use when
@@ -26,9 +24,9 @@ sending notifications.  If none is provided, the `ForkJoinPool` is used.
 Sending messages:
 
 ```kotlin
-val message = FcmNotification(to = "device-token", message = Notification(title = "title"))
-
-val future = fcmClient.sendNotification(fcmNotification)
+val token = "device-token"
+val message = FcmMessage(to = token, notification = Notification(title = "title"))
+val future = fcmClient.sendNotification(message)
 ```
 
 `sendNotification()` gives you a [`CompletableFuture`](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html).
@@ -51,7 +49,7 @@ future.whenComplete { fcmResponse, throwable ->
 
         fcmResponse.results.forEach {
             if (it.error == Error.NOT_REGISTERED) {
-                logger.info("${Error.NOT_REGISTERED} for token <${token}> (registrationId ${it.registrationId})")
+                logger.info("${Error.NOT_REGISTERED} for token <$token> (registrationId ${it.registrationId})")
                 // Delete token from your DB
             } else if (it.error != null) {
                 logger.warn("Error from FCM for registrationId ${it.registrationId}: ${it.error}")
@@ -73,3 +71,13 @@ future.whenComplete { fcmResponse, throwable ->
 ```
 
 Handling responses to multicast messages is left as an exercise for the reader.
+
+# Usage (in Java, but you should really start using Kotlin)
+
+```java
+FcmClient fcmClient = new FcmClientImpl(new URI("https://fcm.googleapis.com/fcm/send"),
+        "your-fcm-server-key",
+        HttpClients.createDefault(),
+        new ObjectMapper(),
+        null);
+```

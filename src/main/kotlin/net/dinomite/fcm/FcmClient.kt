@@ -23,7 +23,7 @@ interface FcmClient {
 /**
  *
  */
-class FcmClientImpl(val httpClient: CloseableHttpClient, val fcmUrl: URI, fcmKey: String,
+class FcmClientImpl(val fcmUrl: URI, fcmKey: String, val httpClient: CloseableHttpClient,
                     objectMapper: ObjectMapper, val executorService: ExecutorService? = null) : FcmClient {
     val responseReader: ObjectReader = objectMapper.readerFor(FcmResponse::class.java)
     val objectWriter: ObjectWriter = objectMapper.writer()
