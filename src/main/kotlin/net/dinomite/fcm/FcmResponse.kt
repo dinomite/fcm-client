@@ -28,7 +28,7 @@ enum class Error(val text: String) {
     companion object {
         @JsonCreator
         fun fromString(search: String?): Error? {
-            return Error.values().firstOrNull { it.name.equals(search, true) }
+            return Error.values().firstOrNull { it.text.equals(search, true) }
         }
     }
 }
