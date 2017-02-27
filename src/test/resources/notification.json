@@ -1,0 +1,13 @@
+{
+  "title" : "title",
+  "body" : "body",
+  "icon" : "icon",
+  "sound" : "sound",
+  "tag" : "tag",
+  "color" : "color",
+  "click_action" : "clickAction",
+  "body_loc_key" : "bodyLocKey",
+  "body_loc_args" : "bodyLocArgs",
+  "title_loc_key" : "titleLocKey",
+  "title_loc_args" : "titleLocArgs"
+}

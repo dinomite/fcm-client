@@ -1,0 +1,11 @@
+{
+  "multicast_id" : 1234567891011,
+  "success" : 7,
+  "failure" : 3,
+  "canonical_ids" : 9,
+  "results" : [ {
+    "message_id" : "foobar",
+    "registration_id" : "bazqux",
+    "error" : "error:MissingRegistration"
+  } ]
+}

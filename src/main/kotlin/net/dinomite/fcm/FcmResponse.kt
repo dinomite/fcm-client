@@ -1,6 +1,7 @@
 package net.dinomite.fcm
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 
 data class FcmResponse(val multicastId: Long,
                        val success: Int,
@@ -25,9 +26,12 @@ enum class Error(val text: String) {
     TOPICS_MESSAGE_RATE_EXCEEDED("TopicsMessageRateExceeded"),
     INVALID_APNS_CREDENTIAL("InvalidApnsCredential");
 
+    @JsonValue
+    fun text(): String = this.text
+
     companion object {
         @JsonCreator
-        fun fromString(search: String?): Error? {
+        fun valueOf(search: String?): Error? {
             return Error.values().firstOrNull { it.text.equals(search, true) }
         }
     }
