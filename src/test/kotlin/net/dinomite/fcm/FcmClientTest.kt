@@ -6,7 +6,6 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.matching.UrlPattern
-import net.dinomite.fcm.*
 import org.apache.http.HttpHeaders
 import org.apache.http.impl.client.HttpClients
 import org.junit.Assert.assertEquals
@@ -31,7 +30,7 @@ class FcmClientTest {
         fcmUrl = URI("http://localhost:${wireMockServer.port()}/firebase")
         fcmUrlPathMatcher = urlEqualTo(fcmUrl.path)
 
-        fcmClient = FcmClientImpl(fcmUrl, fcmKey, HttpClients.createDefault(), objectMapper)
+        fcmClient = FcmClient(fcmUrl, fcmKey, HttpClients.createDefault(), objectMapper)
     }
 
     @Test

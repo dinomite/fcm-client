@@ -14,11 +14,11 @@ send to Firebase and the responses they give.
 First, construct an `FcmClient`:
 
 ```kotlin
-FcmClientImpl(URI("https://fcm.googleapis.com/fcm/send"), "your-fcm-server-key",
+FcmClient(URI("https://fcm.googleapis.com/fcm/send"), "your-fcm-server-key",
               HttpClients.createDefault(), ObjectMapper())
 ```
 
-There is an optional final parameter to the `FcmClientImpl`, an `ExecutorService` to use when
+There is an optional final parameter to the `FcmClient`, an `ExecutorService` to use when
 sending notifications.  If none is provided, the `ForkJoinPool` is used.
 
 Sending messages:
@@ -83,7 +83,7 @@ objects in Java you have to supply all fields, even optional ones.  The best fix
 Kotlin, which is incredibly easy to add to any Java project and will make your life better.
 
 ```java
-FcmClient fcmClient = new FcmClientImpl(
+FcmClient fcmClient = new FcmClient(
         new URI("https://fcm.googleapis.com/fcm/send"),
         "your-fcm-server-key",
         HttpClients.createDefault(),

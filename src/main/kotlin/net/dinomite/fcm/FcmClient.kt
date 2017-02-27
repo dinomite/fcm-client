@@ -16,21 +16,17 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 import java.util.function.Supplier
 
-interface FcmClient {
-    fun sendNotification(message: FcmMessage): CompletableFuture<FcmResponse>
-}
-
 /**
  *
  */
-class FcmClientImpl(val fcmUrl: URI, fcmKey: String, val httpClient: CloseableHttpClient,
-                    objectMapper: ObjectMapper, val executorService: ExecutorService? = null) : FcmClient {
+open class FcmClient(val fcmUrl: URI, fcmKey: String, val httpClient: CloseableHttpClient,
+                    objectMapper: ObjectMapper, val executorService: ExecutorService? = null) {
     val responseReader: ObjectReader = objectMapper.readerFor(FcmResponse::class.java)
     val objectWriter: ObjectWriter = objectMapper.writer()
     val contentType: ContentType = ContentType.APPLICATION_JSON.withCharset(Charsets.UTF_8)
     val authHeader: Header = BasicHeader(HttpHeaders.AUTHORIZATION, "key=$fcmKey")
 
-    override fun sendNotification(message: FcmMessage): CompletableFuture<FcmResponse> {
+    fun sendNotification(message: FcmMessage): CompletableFuture<FcmResponse> {
         if (executorService == null) {
             return CompletableFuture.supplyAsync { send(message) }
         } else {
