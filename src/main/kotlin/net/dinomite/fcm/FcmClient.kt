@@ -17,7 +17,15 @@ import java.util.concurrent.ExecutorService
 import java.util.function.Supplier
 
 /**
+ * A client for sending messages to Firebase Cloud messaging.
  *
+ * @param fcmUrl            The URL to communicate with FCM (probably https://fcm.googleapis.com/fcm/send)
+ * @param fcmKey            The Server key (from your project in the <a href="https://console.firebase.google.com">Firebase Console</a>)
+ * @param httpClient        A <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/impl/client/CloseableHttpClient.html">CloseableHttpClient</a>
+ * @param objectMapper      An <a href="https://fasterxml.github.io/jackson-databind/javadoc/2.8/com/fasterxml/jackson/databind/ObjectMapper.html">ObjectMapper</a>, used for (de)serialization of messages when communicating with FCM
+ * @param executorService   An ExecutorService used for dispatching requests.  If none is provided, <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html">ForkJoinPool is used</a>
+ *
+ * @returns An FcmClient
  */
 open class FcmClient(val fcmUrl: URI, fcmKey: String, val httpClient: CloseableHttpClient,
                     objectMapper: ObjectMapper, val executorService: ExecutorService? = null) {
@@ -26,6 +34,13 @@ open class FcmClient(val fcmUrl: URI, fcmKey: String, val httpClient: CloseableH
     val contentType: ContentType = ContentType.APPLICATION_JSON.withCharset(Charsets.UTF_8)
     val authHeader: Header = BasicHeader(HttpHeaders.AUTHORIZATION, "key=$fcmKey")
 
+    /**
+     * Send a notification to Firebase
+     *
+     * @param message   An {@link net.dinomite.fcm.FcmMessage} to send to Firebase
+     *
+     * @returns A CompletableFuture<FcmResponse>, which throws FcmException for fatal errors
+     */
     fun sendNotification(message: FcmMessage): CompletableFuture<FcmResponse> {
         if (executorService == null) {
             return CompletableFuture.supplyAsync { send(message) }
