@@ -41,7 +41,7 @@ dependencies {
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
-    from sourceSets.main.allJava
+    from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
