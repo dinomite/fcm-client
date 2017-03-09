@@ -30,7 +30,6 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     compile "org.apache.httpcomponents:httpclient:4.5.3"
     compile "com.fasterxml.jackson.core:jackson-databind:2.7.8"
@@ -47,11 +46,6 @@ task sourceJar(type: Jar, dependsOn: classes) {
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
-}
-
-jar {
-    from sourceSets.main.output
-    from sourceSets.main.allJava
 }
 
 publishing {
