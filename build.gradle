@@ -11,7 +11,7 @@ buildscript {
 }
 
 plugins {
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
     id 'com.jfrog.bintray' version '1.7.2'
     id 'net.researchgate.release' version '2.4.1'
@@ -29,10 +29,11 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    compile "org.apache.httpcomponents:httpclient:4.5.3"
-    compile "com.fasterxml.jackson.core:jackson-databind:2.7.8"
+    api "org.apache.httpcomponents:httpclient:4.5.3"
+    api "com.fasterxml.jackson.core:jackson-databind:2.7.8"
 
     testCompile "junit:junit:4.12"
     testCompile "com.github.tomakehurst:wiremock:2.5.1"
